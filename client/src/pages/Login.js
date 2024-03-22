@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, message } from "antd";
 import axios from "axios";
@@ -10,12 +10,20 @@ const Login = () => {
     try {
       const { data } = await axios.post("/users/login", values);
       message.success("Login Successful");
-      localStorage.setItem("user", JSON.stringify({ ...data, password: "" }));
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ ...data.user, password: "" })
+      );
       navigate("/");
     } catch (error) {
       message.error("Something went wrong");
     }
   };
+  useEffect(() => {
+    if (localStorage.getItem("user")) {
+      navigate("/");
+    }
+  }, [navigate]);
   return (
     <>
       <div className="register-page ">

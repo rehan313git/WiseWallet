@@ -3,7 +3,7 @@ const userModel = require("../models/userModel");
 const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
-    // if token , req.headers
+    // if token , use req.headers
     const user = await userModel.findOne({ email, password });
 
     if (!user) {

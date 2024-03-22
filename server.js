@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
-require("colors");
 const connectDB = require("./config/connectDB");
 
 dotenv.config();
@@ -18,10 +17,10 @@ app.use(express.json());
 app.use(cors());
 
 //routes
-app.get("/", (req, res) => {
-  res.send("<h1> Rehan this side </h1>");
-});
-app.get("/api/v1/users", require("./routes/userRoute"));
+// app.get("/", (req, res) => {
+//   res.send("<h1> Rehan this side </h1>");
+// });
+app.use("/api/v1/users", require("./routes/userRoute"));
 
 //port
 const PORT = 8080 || process.env.PORT;

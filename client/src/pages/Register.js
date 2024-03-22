@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, message } from "antd";
 import axios from "axios";
@@ -12,9 +12,15 @@ const Register = () => {
       message.success("Registration Successful");
       navigate("/login");
     } catch (error) {
-      message.error("invalid entries detected");
+      message.error("Something went wrong");
     }
   };
+
+  useEffect(() => {
+    if (localStorage.getItem("user")) {
+      navigate("/");
+    }
+  }, [navigate]);
   return (
     <>
       <div className="register-page ">
