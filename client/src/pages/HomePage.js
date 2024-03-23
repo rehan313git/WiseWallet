@@ -1,13 +1,66 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "./../components/Layout/Layout";
-import { Form, Input, Modal, Select } from "antd";
+import { Form, Input, Modal, Select, message, Table } from "antd";
 import FormItem from "antd/es/form/FormItem";
-
+import axios from "axios";
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
+  const [AllTransactions, setAllTransactions] = useState([]);
+  const getAllTransactions = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const res = await axios.post("/transactions//getall-transaction", {
+        userid: user._id,
+      });
+      setAllTransactions(res.data);
+      console.log(res.data);
+    } catch (error) {
+      console.log(error);
+      message.error("Could Not Fetch");
+    }
+  };
+  const columns = [
+    {
+      title: "Date",
+      dataIndex: "date",
+    },
+    {
+      title: "Amount",
+      dataIndex: "amount",
+    },
+    {
+      title: "Type",
+      dataIndex: "type",
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+    },
+    {
+      title: "Your Desciption",
+      dataIndex: "description",
+    },
+    {
+      title: "Actions",
+    },
+  ];
+  useEffect(() => {
+    getAllTransactions();
+  }, []);
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values) => {
     console.log(values);
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      await axios.post("/transactions/add-transaction", {
+        ...values,
+        userid: user._id,
+      });
+      message.success("Transaction Added Successfully");
+    } catch (error) {
+      console.log(error);
+      message.error("Something went wrong");
+    }
   };
   return (
     <Layout>
@@ -18,7 +71,9 @@ const HomePage = () => {
           Add New
         </div>
       </div>
-      <div className="content"></div>
+      <div className="content">
+        <Table columns={columns} dataSource={AllTransactions} />
+      </div>
       <Modal
         title="Enter Transaction"
         open={showModal}
@@ -46,10 +101,7 @@ const HomePage = () => {
             </Select>
           </FormItem>
           <FormItem label="Date" name="date">
-            <Input type="date" />
-          </FormItem>
-          <FormItem label="Reference" name="reference">
-            <Input type="text" />
+            <Input type="Date" />
           </FormItem>
           <FormItem label="Description" name="description">
             <Input type="text" />

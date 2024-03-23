@@ -23,7 +23,7 @@ const transactionSchema = new mongoose.Schema(
       required: [true, "Describe your transaction"],
     },
     date: {
-      type: String,
+      type: Date,
       required: [true, "Date of transaction is required !"],
     },
   },
@@ -33,3 +33,4 @@ const transactionSchema = new mongoose.Schema(
 );
 
 const transactionModel = mongoose.model("transactions", transactionSchema);
+module.exports = transactionModel;
