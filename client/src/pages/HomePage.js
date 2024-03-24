@@ -3,26 +3,18 @@ import Layout from "./../components/Layout/Layout";
 import { Form, Input, Modal, Select, message, Table } from "antd";
 import FormItem from "antd/es/form/FormItem";
 import axios from "axios";
+import moment from "moment";
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
-  const [AllTransactions, setAllTransactions] = useState([]);
-  const getAllTransactions = async () => {
-    try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const res = await axios.post("/transactions//getall-transaction", {
-        userid: user._id,
-      });
-      setAllTransactions(res.data);
-      console.log(res.data);
-    } catch (error) {
-      console.log(error);
-      message.error("Could Not Fetch");
-    }
-  };
+
+  const [allTransactions, setAllTransactions] = useState([]);
+  const [freq, setFreq] = useState("7");
+
   const columns = [
     {
       title: "Date",
       dataIndex: "date",
+      render: (text) => <span>{moment(text).format("YYYY-MM-DD")}</span>,
     },
     {
       title: "Amount",
@@ -45,8 +37,22 @@ const HomePage = () => {
     },
   ];
   useEffect(() => {
+    const getAllTransactions = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const res = await axios.post("/transactions//getall-transaction", {
+          userid: user._id,
+          freq,
+        });
+        setAllTransactions(res.data);
+        console.log(res.data);
+      } catch (error) {
+        console.log(error);
+        message.error("Could Not Fetch");
+      }
+    };
     getAllTransactions();
-  }, []);
+  }, [freq]);
 
   const handleSubmit = async (values) => {
     console.log(values);
@@ -66,17 +72,27 @@ const HomePage = () => {
     <Layout>
       {/* <h1>HomePage</h1> */}
       <div className="filters">
-        <div>range filters</div>
+        <div>
+          <h6>Frequency</h6>
+          <Select value={freq} onChange={(values) => setFreq(values)}>
+            <Select.Option value="10000">Default</Select.Option>
+            <Select.Option value="7">Previous Week</Select.Option>
+            <Select.Option value="30">Previous Month</Select.Option>
+            <Select.Option value="365">Previous Year</Select.Option>
+            <Select.Option value="custom">Custom</Select.Option>
+          </Select>
+        </div>
         <div className="btn btn-primary " onClick={() => setShowModal(true)}>
           Add New
         </div>
       </div>
       <div className="content">
-        <Table columns={columns} dataSource={AllTransactions} />
+        <Table columns={columns} dataSource={allTransactions} />
       </div>
       <Modal
         title="Enter Transaction"
         open={showModal}
+        // onFinish={" "}
         onCancel={() => setShowModal(false)}
       >
         <Form layout="vertical" onFinish={handleSubmit}>

@@ -26,7 +26,9 @@ const Header = () => {
           </div>
           <div>
             <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
-              <li className="nav-username  ">{loginUser && loginUser.name}</li>
+              <div className="nav-username  ">
+                {loginUser && loginUser.name}
+              </div>
               <button
                 className=" btn btn-danger nav-logout rounded "
                 onClick={logoutHandler}
