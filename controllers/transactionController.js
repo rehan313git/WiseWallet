@@ -2,7 +2,7 @@ const transactionModel = require("../models/transactionModel");
 const moment = require("moment");
 const getAllTransaction = async (req, res) => {
   try {
-    const { freq, selectedDate } = req.body;
+    const { freq, selectedDate, type } = req.body;
     const transactions = await transactionModel.find({
       ...(freq !== "custom"
         ? {
@@ -17,6 +17,7 @@ const getAllTransaction = async (req, res) => {
             },
           }),
       userid: req.body.userid,
+      ...(type !== "all" && { type }),
     });
     res.status(200).send(transactions);
   } catch (error) {

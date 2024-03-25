@@ -9,8 +9,9 @@ const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
 
   const [allTransactions, setAllTransactions] = useState([]);
-  const [freq, setFreq] = useState("7");
+  const [freq, setFreq] = useState("30");
   const [selectedDate, setSelectedDate] = useState([]);
+  const [type, setType] = useState("all");
   const columns = [
     {
       title: "Date",
@@ -45,6 +46,7 @@ const HomePage = () => {
           userid: user._id,
           freq,
           selectedDate,
+          type,
         });
         setAllTransactions(res.data);
         console.log(res.data);
@@ -54,7 +56,7 @@ const HomePage = () => {
       }
     };
     getAllTransactions();
-  }, [freq, selectedDate]);
+  }, [freq, selectedDate, type]);
 
   const handleSubmit = async (values) => {
     console.log(values);
@@ -89,6 +91,14 @@ const HomePage = () => {
               onChange={(values) => setSelectedDate(values)}
             />
           )}
+        </div>
+        <div>
+          <h6>Type</h6>
+          <Select value={type} onChange={(values) => setType(values)}>
+            <Select.Option value="all">All</Select.Option>
+            <Select.Option value="income">Income</Select.Option>
+            <Select.Option value="expenditure">Expenditure</Select.Option>
+          </Select>
         </div>
         <div className="btn btn-primary " onClick={() => setShowModal(true)}>
           Add New
