@@ -4,6 +4,9 @@ import { Form, Input, Modal, Select, message, Table, DatePicker } from "antd";
 import FormItem from "antd/es/form/FormItem";
 import axios from "axios";
 import moment from "moment";
+import { UnorderedListOutlined, AreaChartOutlined } from "@ant-design/icons";
+import Charts from "../components/Charts";
+
 const { RangePicker } = DatePicker;
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -12,6 +15,7 @@ const HomePage = () => {
   const [freq, setFreq] = useState("30");
   const [selectedDate, setSelectedDate] = useState([]);
   const [type, setType] = useState("all");
+  const [viewData, setViewData] = useState("table");
   const columns = [
     {
       title: "Date",
@@ -100,12 +104,30 @@ const HomePage = () => {
             <Select.Option value="expenditure">Expenditure</Select.Option>
           </Select>
         </div>
+        <div className="icons">
+          <UnorderedListOutlined
+            className={`mx-2 ${
+              viewData === "table" ? "active_icon" : "inactive_icon"
+            }`}
+            onClick={() => setViewData("table")}
+          />
+          <AreaChartOutlined
+            className={`mx-2 ${
+              viewData === "chart" ? "active_icon" : "inactive_icon"
+            }`}
+            onClick={() => setViewData("chart")}
+          />
+        </div>
         <div className="btn btn-primary " onClick={() => setShowModal(true)}>
           Add New
         </div>
       </div>
       <div className="content">
-        <Table columns={columns} dataSource={allTransactions} />
+        {viewData === "table" ? (
+          <Table columns={columns} dataSource={allTransactions} />
+        ) : (
+          <Charts allTransactions={allTransactions} />
+        )}
       </div>
       <Modal
         title="Enter Transaction"
