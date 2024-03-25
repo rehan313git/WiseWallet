@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import Layout from "./../components/Layout/Layout";
-import { Form, Input, Modal, Select, message, Table } from "antd";
+import { Form, Input, Modal, Select, message, Table, DatePicker } from "antd";
 import FormItem from "antd/es/form/FormItem";
 import axios from "axios";
 import moment from "moment";
+const { RangePicker } = DatePicker;
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
 
   const [allTransactions, setAllTransactions] = useState([]);
   const [freq, setFreq] = useState("7");
-
+  const [selectedDate, setSelectedDate] = useState([]);
   const columns = [
     {
       title: "Date",
@@ -43,6 +44,7 @@ const HomePage = () => {
         const res = await axios.post("/transactions//getall-transaction", {
           userid: user._id,
           freq,
+          selectedDate,
         });
         setAllTransactions(res.data);
         console.log(res.data);
@@ -52,7 +54,7 @@ const HomePage = () => {
       }
     };
     getAllTransactions();
-  }, [freq]);
+  }, [freq, selectedDate]);
 
   const handleSubmit = async (values) => {
     console.log(values);
@@ -81,6 +83,12 @@ const HomePage = () => {
             <Select.Option value="365">Previous Year</Select.Option>
             <Select.Option value="custom">Custom</Select.Option>
           </Select>
+          {freq === "custom" && (
+            <RangePicker
+              value={selectedDate}
+              onChange={(values) => setSelectedDate(values)}
+            />
+          )}
         </div>
         <div className="btn btn-primary " onClick={() => setShowModal(true)}>
           Add New
