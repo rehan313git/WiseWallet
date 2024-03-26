@@ -20,9 +20,9 @@ app.use(cors());
 // app.get("/", (req, res) => {
 //   res.send("<h1> Rehan this side </h1>");
 // });
-app.use("/api/v1/users", require("./routes/userRoute"));
+app.use("/users", require("./routes/userRoute"));
 
-app.use("/api/v1/transactions", require("./routes/transactionRoutes"));
+app.use("/transactions", require("./routes/transactionRoutes"));
 
 //port
 const PORT = 8080 || process.env.PORT;

@@ -4,7 +4,12 @@ import { Form, Input, Modal, Select, message, Table, DatePicker } from "antd";
 import FormItem from "antd/es/form/FormItem";
 import axios from "axios";
 import moment from "moment";
-import { UnorderedListOutlined, AreaChartOutlined } from "@ant-design/icons";
+import {
+  UnorderedListOutlined,
+  AreaChartOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import Charts from "../components/Charts";
 
 const { RangePicker } = DatePicker;
@@ -16,6 +21,7 @@ const HomePage = () => {
   const [selectedDate, setSelectedDate] = useState([]);
   const [type, setType] = useState("all");
   const [viewData, setViewData] = useState("table");
+  const [edit, setEdit] = useState(null);
   const columns = [
     {
       title: "Date",
@@ -40,13 +46,29 @@ const HomePage = () => {
     },
     {
       title: "Actions",
+      render: (text, record) => (
+        <div>
+          <EditOutlined
+            onClick={() => {
+              setEdit(record);
+              setShowModal(true);
+            }}
+          />
+          <DeleteOutlined
+            className="mx-2"
+            onClick={() => {
+              handleDelete(record);
+            }}
+          />
+        </div>
+      ),
     },
   ];
   useEffect(() => {
     const getAllTransactions = async () => {
       try {
         const user = JSON.parse(localStorage.getItem("user"));
-        const res = await axios.post("/transactions//getall-transaction", {
+        const res = await axios.post("/transactions/getall-transaction", {
           userid: user._id,
           freq,
           selectedDate,
@@ -66,16 +88,41 @@ const HomePage = () => {
     console.log(values);
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      await axios.post("/transactions/add-transaction", {
-        ...values,
-        userid: user._id,
-      });
-      message.success("Transaction Added Successfully");
+      if (edit) {
+        await axios.post("/transactions/edit-transaction", {
+          payload: {
+            ...values,
+            userid: user._id,
+          },
+          transactionId: edit._id,
+        });
+        message.success("Transaction Updated Successfully");
+      } else {
+        await axios.post("/transactions/add-transaction", {
+          ...values,
+          userid: user._id,
+        });
+        message.success("Transaction Added Successfully");
+      }
+      setShowModal(false);
+      setEdit(null);
     } catch (error) {
       console.log(error);
       message.error("Something went wrong");
     }
   };
+  const handleDelete = async (record) => {
+    try {
+      await axios.post("/transactions/delete-transaction", {
+        transactionId: record._id,
+      });
+      message.success("Transaction Deleted");
+    } catch (error) {
+      console.log(error);
+      message.error("Unable to delete !");
+    }
+  };
+
   return (
     <Layout>
       {/* <h1>HomePage</h1> */}
@@ -83,7 +130,7 @@ const HomePage = () => {
         <div>
           <h6>Frequency</h6>
           <Select value={freq} onChange={(values) => setFreq(values)}>
-            <Select.Option value="10000">Default</Select.Option>
+            <Select.Option value="default">Default</Select.Option>
             <Select.Option value="7">Previous Week</Select.Option>
             <Select.Option value="30">Previous Month</Select.Option>
             <Select.Option value="365">Previous Year</Select.Option>
@@ -130,12 +177,12 @@ const HomePage = () => {
         )}
       </div>
       <Modal
-        title="Enter Transaction"
+        title={edit ? "Edit Transaction" : "Add Transaction"}
         open={showModal}
         // onFinish={" "}
         onCancel={() => setShowModal(false)}
       >
-        <Form layout="vertical" onFinish={handleSubmit}>
+        <Form layout="vertical" onFinish={handleSubmit} initialValues={edit}>
           <FormItem label="Amount" name="amount">
             <Input type="text" />
           </FormItem>
